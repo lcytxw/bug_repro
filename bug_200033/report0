@@ -1,0 +1,60 @@
+==================================================================
+BUG: KASAN: stack-out-of-bounds in __xfrm6_daddr_saddr_hash net/xfrm/xfrm_hash.h:29 [inline]
+BUG: KASAN: stack-out-of-bounds in __xfrm_dst_hash net/xfrm/xfrm_hash.h:96 [inline]
+BUG: KASAN: stack-out-of-bounds in xfrm_dst_hash net/xfrm/xfrm_state.c:61 [inline]
+BUG: KASAN: stack-out-of-bounds in xfrm_state_find+0x2b18/0x3160 net/xfrm/xfrm_state.c:953
+Read of size 4 at addr ffff88004ad57b20 by task syz-executor0/4355
+
+CPU: 0 PID: 4355 Comm: syz-executor0 Not tainted 4.18.0-rc1 #2
+Hardware name: QEMU Standard PC (i440FX + PIIX, 1996), BIOS rel-1.10.2-0-g5f4c7b1-prebuilt.qemu-project.org 04/01/2014
+Call Trace:
+ __dump_stack lib/dump_stack.c:77 [inline]
+ dump_stack+0x122/0x1c8 lib/dump_stack.c:113
+ print_address_description+0x88/0x3b0 mm/kasan/report.c:256
+ kasan_report_error mm/kasan/report.c:354 [inline]
+ kasan_report+0x185/0x4a0 mm/kasan/report.c:412
+ __asan_report_load4_noabort+0x19/0x20 mm/kasan/report.c:432
+ __xfrm6_daddr_saddr_hash net/xfrm/xfrm_hash.h:29 [inline]
+ __xfrm_dst_hash net/xfrm/xfrm_hash.h:96 [inline]
+ xfrm_dst_hash net/xfrm/xfrm_state.c:61 [inline]
+ xfrm_state_find+0x2b18/0x3160 net/xfrm/xfrm_state.c:953
+ xfrm_tmpl_resolve_one net/xfrm/xfrm_policy.c:1393 [inline]
+ xfrm_tmpl_resolve+0x418/0xc10 net/xfrm/xfrm_policy.c:1437
+ xfrm_resolve_and_create_bundle+0x112/0x980 net/xfrm/xfrm_policy.c:1832
+ xfrm_lookup+0x298/0x1be0 net/xfrm/xfrm_policy.c:2162
+ xfrm_lookup_route+0x42/0x1f0 net/xfrm/xfrm_policy.c:2282
+ ip_route_output_flow+0x86/0xc0 net/ipv4/route.c:2588
+ udp_sendmsg+0x15c1/0x2180 net/ipv4/udp.c:1086
+ inet_sendmsg+0x103/0x490 net/ipv4/af_inet.c:798
+ sock_sendmsg_nosec net/socket.c:645 [inline]
+ sock_sendmsg+0xf9/0x180 net/socket.c:655
+ __sys_sendto+0x239/0x3c0 net/socket.c:1833
+ __do_sys_sendto net/socket.c:1845 [inline]
+ __se_sys_sendto net/socket.c:1841 [inline]
+ __x64_sys_sendto+0xef/0x1c0 net/socket.c:1841
+ do_syscall_64+0xb8/0x3a0 arch/x86/entry/common.c:290
+ entry_SYSCALL_64_after_hwframe+0x49/0xbe
+RIP: 0033:0x455a09
+Code: 1d ba fb ff c3 66 2e 0f 1f 84 00 00 00 00 00 66 90 48 89 f8 48 89 f7 48 89 d6 48 89 ca 4d 89 c2 4d 89 c8 4c 8b 4c 24 08 0f 05 <48> 3d 01 f0 ff ff 0f 83 eb b9 fb ff c3 66 2e 0f 1f 84 00 00 00 00 
+RSP: 002b:00007f58654ecc68 EFLAGS: 00000246 ORIG_RAX: 000000000000002c
+RAX: ffffffffffffffda RBX: 00007f58654ed6d4 RCX: 0000000000455a09
+RDX: 0000000000000000 RSI: 00000000200014c0 RDI: 0000000000000013
+RBP: 000000000072bea0 R08: 0000000020001540 R09: 0000000000000010
+R10: 0000000000000000 R11: 0000000000000246 R12: 00000000ffffffff
+R13: 00000000000005d7 R14: 00000000006fdcc8 R15: 0000000000000000
+
+The buggy address belongs to the page:
+page:ffffea00012b55c0 count:0 mapcount:0 mapping:0000000000000000 index:0x0
+flags: 0x100000000000000()
+raw: 0100000000000000 0000000000000000 ffffea00012b55c8 0000000000000000
+raw: 0000000000000000 0000000000000000 00000000ffffffff 0000000000000000
+page dumped because: kasan: bad access detected
+
+Memory state around the buggy address:
+ ffff88004ad57a00: f2 00 f4 f4 f4 f2 f2 f2 f2 00 00 00 00 f2 f2 f2
+ ffff88004ad57a80: f2 00 00 00 00 00 f4 f4 f4 f2 f2 f2 f2 00 00 00
+>ffff88004ad57b00: 00 00 00 00 f4 f2 f2 f2 f2 00 00 00 00 00 00 00
+                               ^
+ ffff88004ad57b80: 00 00 f4 f4 f4 f3 f3 f3 f3 00 00 00 00 00 00 00
+ ffff88004ad57c00: 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00
+==================================================================
